@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -136,6 +137,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+os.makedirs("cache", exist_ok=True)
 fastf1.Cache.enable_cache("cache")
 
 # ---------------- HELPERS ----------------
