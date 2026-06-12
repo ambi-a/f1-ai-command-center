@@ -1,7 +1,18 @@
-import ollama
+try:
+    import ollama
+except Exception:
+    ollama = None
 
 
 def generate_commentary(driver, avg_lap, best_lap, tyre_text, telemetry_text):
+
+    if ollama is None:
+        return """
+        AI commentary is unavailable in the cloud deployment.
+
+        The local version supports Llama-powered post-race analysis.
+        """
+
     prompt = f"""
     You are an expert Formula 1 race analyst similar to David Coulthard,
     Jolyon Palmer, Martin Brundle or an F1TV post-race analyst.
