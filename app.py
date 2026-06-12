@@ -345,16 +345,32 @@ load_button = st.sidebar.button("Load Race Data")
 # ---------------- LOAD DATA ----------------
 if load_button:
     with st.spinner("Loading F1 data..."):
-        session = fastf1.get_session(year, race, session_type)
-        session.load()
+        try:
+            session = fastf1.get_session(year, race, session_type)
+            session.load(
+                laps=True,
+                telemetry=True,
+                weather=True,
+                messages=True
+            )
 
-        st.session_state["laps"] = session.laps
+            laps = session.laps
+
+            if laps is None or laps.empty:
+                st.error("No lap data was loaded for this session. Try another race/session.")
+                st.stop()
+        st.session_state["laps"] = laps
         st.session_state["year"] = year
         st.session_state["race"] = race
         st.session_state["session_type"] = session_type
 
         st.success("Race data loaded!")
         st.toast("Telemetry loaded successfully 🏎️")
+        except Exception as e:
+            st.error("FastF1 could not load this session on Streamlit Cloud.")
+            st.info("Try a completed race session such as 2024 Monza Race or 2024 Bahrain Race.")
+            st.exception(e)
+            st.stop()
 
 # ---------------- MAIN DASHBOARD ----------------
 if "laps" in st.session_state:
