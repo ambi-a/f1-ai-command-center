@@ -1,6 +1,6 @@
 streamlit
 pandas
 plotly
-fastf1
+fastf1==3.4.4
 scikit-learn
-ollama
+numpy==1.26.4
