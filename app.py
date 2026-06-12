@@ -343,35 +343,42 @@ session_type = st.sidebar.selectbox(
 load_button = st.sidebar.button("Load Race Data")
 
 # ---------------- LOAD DATA ----------------
+# ---------------- LOAD DATA ----------------
 if load_button:
     with st.spinner("Loading F1 data..."):
         try:
-            session = fastf1.get_session(year, race, session_type)
-            session.load(
-                laps=True,
-                telemetry=True,
-                weather=True,
-                messages=True
+            session = fastf1.get_session(
+                year,
+                race,
+                session_type
             )
 
-            laps = session.laps
+            session.load()
+
+            try:
+                laps = session.laps
+            except Exception:
+                st.error("Lap data did not load for this session.")
+                st.info("Try a completed race, for example: 2024 → Bahrain → R")
+                st.stop()
 
             if laps is None or laps.empty:
-                st.error("No lap data was loaded for this session. Try another race/session.")
+                st.error("No lap data available for this session.")
+                st.info("Try another completed race/session.")
                 st.stop()
-        st.session_state["laps"] = laps
-        st.session_state["year"] = year
-        st.session_state["race"] = race
-        st.session_state["session_type"] = session_type
 
-        st.success("Race data loaded!")
-        st.toast("Telemetry loaded successfully 🏎️")
+            st.session_state["laps"] = laps
+            st.session_state["year"] = year
+            st.session_state["race"] = race
+            st.session_state["session_type"] = session_type
+
+            st.success("Race data loaded!")
+
         except Exception as e:
             st.error("FastF1 could not load this session on Streamlit Cloud.")
-            st.info("Try a completed race session such as 2024 Monza Race or 2024 Bahrain Race.")
+            st.info("Try 2024 → Bahrain → R first.")
             st.exception(e)
             st.stop()
-
 # ---------------- MAIN DASHBOARD ----------------
 if "laps" in st.session_state:
     laps = st.session_state["laps"]
